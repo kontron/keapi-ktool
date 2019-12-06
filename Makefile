@@ -1,9 +1,25 @@
+TOPDIR := $(shell pwd)
+
 CC = gcc
-CFLAGS = -I./include -I/usr/include/keapi -Wall -Wextra -pedantic -g -O0
-LDFLAGS = -lkeapi
+CFLAGS ?= -Wall -Wextra -pedantic -g -O0
+LDFLAGS ?= -lkeapi
+
+PKG_CONFIG ?= pkg-config
+INSTALL ?= install
+
+# install directories
+PREFIX ?= /usr
+SBINDIR ?= $(PREFIX)/sbin
+
+cflags_for_lib = $(shell $(PKG_CONFIG) --cflags $(1))
+ldflags_for_lib = $(shell $(PKG_CONFIG) --libs $(1))
+
+KEAPI_CFLAGS += -I$(TOPDIR)/include
+KEAPI_CFLAGS += $(call cflags_for_lib,keapi)
+
+KEAPI_LIBS += $(call ldflags_for_lib,keapi)
 
 OUT_DIR = bin
-FILE_EXT =
 
 SRCS = src/keapi-battery.c src/keapi-cpu.c src/keapi-eeprom.c \
 	src/keapi-gpio.c src/keapi-pcidev.c src/keapi-voltage.c \
@@ -14,13 +30,24 @@ SRCS = src/keapi-battery.c src/keapi-cpu.c src/keapi-eeprom.c \
 
 OBJECTS=$(SRCS:.c=.o)
 
-all: clean $(OUT_DIR) $(OBJECTS) ktool
+DEPS := $(shell find $(TOPDIR) -name '*.d')
 
-ktool: $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) $(LDFLAGS) -o $(OUT_DIR)/$@
+all: $(OUT_DIR)/ktool
 
+src/%.o: src/%.c
+	$(CC) -MD -MT $@ -MF $(@:.o=.d) $(CFLAGS) $(KEAPI_CFLAGS) -c -o $@ $<
+
+$(OUT_DIR)/ktool: $(OBJECTS)
+	mkdir -p $(OUT_DIR)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ $(KEAPI_LIBS)
+
+install: $(OUT_DIR)/ktool
+	$(INSTALL) -d -m 0755 $(DESTDIR)$(SBINDIR)
+	$(INSTALL) -m 0755 $(OUT_DIR)/ktool $(DESTDIR)/$(SBINDIR)
+
+.PHONY: clean
 clean:
 	rm -rf $(OUT_DIR)/* $(SRCS:.c=.o)
+	rm -f $(DEPS)
 
-$(OUT_DIR):
-	mkdir -p $(OUT_DIR)
+-include $(DEPS)
