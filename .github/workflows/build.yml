@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  Ubuntu:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y build-essential libatasmart-dev libjansson-dev
+          git clone https://github.com/kontron/keapi.git
+          cd keapi
+          autoreconf --install && ./configure --prefix=/usr ${CONFIGURE_FLAGS}
+          make
+          sudo make install
+      - name: Build
+        run: make
+      - name: Install
+        run: sudo make install
+      - name: Test
+        run: ktool gen GetLibVersion
