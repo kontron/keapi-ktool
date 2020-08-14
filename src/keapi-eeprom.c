@@ -99,8 +99,8 @@ int eeprom_call(const char *FunctName, int argc, const char *argv[])
 	} else if (strncasecmp(FunctName, "StorageWrite", KEAPI_MAX_STR) == 0) {
 		int32_t storageNr, offset, dataLength = 0;
 		uint8_t *pData;
-		uint8_t dataInput[DATA_BUFFER_SIZE];
-		uint8_t dataSave[DATA_BUFFER_SIZE];
+		uint8_t *dataInput;
+		uint8_t *dataSave;
 		char *pch;
 		int i = 0;
 		CHECK_PARAMS(3);
@@ -133,10 +133,23 @@ int eeprom_call(const char *FunctName, int argc, const char *argv[])
 
 			/* otherwise Hex or Dec numbers in quotes: "0x30 48 50 0x31" */
 		} else {
-			int32_t bufVar;
+			int32_t bufVar, buflen;
 
-			strncpy((char *)dataInput, argv[2], DATA_BUFFER_SIZE);
-			strncpy((char *)dataSave, argv[2], DATA_BUFFER_SIZE);
+			buflen = (int32_t)strlen(argv[2]);
+			dataInput = (uint8_t *)malloc(buflen);
+			if (dataInput == NULL) {
+				fprintf(stderr, "ktool: data allocation error\n");
+				return -1;
+			}
+			dataSave = (uint8_t *)malloc(buflen);
+			if (dataSave == NULL) {
+				fprintf(stderr, "ktool: data allocation error\n");
+				free(dataInput);
+				return -1;
+			}
+
+			strncpy((char *)dataInput, argv[2], buflen);
+			strncpy((char *)dataSave, argv[2], buflen);
 
 			pch = strtok((char *)dataInput, " ");
 			while (pch != NULL) {
@@ -148,15 +161,20 @@ int eeprom_call(const char *FunctName, int argc, const char *argv[])
 
 			if (pData == NULL) {
 				fprintf(stderr, "ktool: data allocation error\n");
+				free(dataInput);
+				free(dataSave);
 				return -1;
 			}
 
-			strncpy((char *)dataInput, (char *)dataSave, DATA_BUFFER_SIZE);
+			strncpy((char *)dataInput, (char *)dataSave, buflen);
 			pch = strtok((char *)dataInput, " ");
 
 			while (pch != NULL) {
 				if (convert_int32(pch, &bufVar) || bufVar < 0 || bufVar > 0xFF) {
 					fprintf(stderr, "Error: Error: Wrong data '%s'\n", pch);
+					free(pData);
+					free(dataInput);
+					free(dataSave);
 					return -1;
 				}
 				pData[i] = (uint8_t)bufVar;
@@ -165,6 +183,8 @@ int eeprom_call(const char *FunctName, int argc, const char *argv[])
 			}
 
 			retvalue = KEApiStorageWrite(storageNr, offset, pData, i);
+			free(dataInput);
+			free(dataSave);
 		}
 
 		free(pData);
