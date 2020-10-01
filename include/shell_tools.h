@@ -41,7 +41,8 @@ enum ApiClass {
 	CT_SPI,
 	CT_TEMP,
 	CT_VOLT,
-	CT_WDT
+	CT_WDT,
+	CT_ADDON
 };
 
 struct cmd_struct {
@@ -74,6 +75,7 @@ extern const char spi_usage[];
 extern const char temperature_usage[];
 extern const char voltage_usage[];
 extern const char watchdog_usage[];
+extern const char addon_usage[];
 
 extern int battery_call(const char *FunctName, int argc, const char *argv[]);
 extern int cpu_call(const char *FunctName, int argc, const char *argv[]);
@@ -93,6 +95,7 @@ extern int spi_call(const char *FunctName, int argc, const char *argv[]);
 extern int temperature_call(const char *FunctName, int argc, const char *argv[]);
 extern int voltage_call(const char *FunctName, int argc, const char *argv[]);
 extern int watchdog_call(const char *FunctName, int argc, const char *argv[]);
+extern int addon_call(const char *FunctName, int argc, const char *argv[]);
 
 #define CHECK_PARAMS(exp) check_params(argc, exp, FunctName);
 

@@ -22,6 +22,7 @@ KEAPI_LIBS += $(call ldflags_for_lib,keapi)
 OUT_DIR = bin
 
 SRCS = src/keapi-battery.c src/keapi-cpu.c src/keapi-eeprom.c \
+	src/keapi-addon.c \
 	src/keapi-gpio.c src/keapi-pcidev.c src/keapi-voltage.c \
 	src/keapi-disk.c src/keapi-fan.c src/keapi-i2c.c \
 	src/keapi-memory.c src/keapi-smbus.c src/keapi-watchdog.c \

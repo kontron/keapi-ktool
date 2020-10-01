@@ -26,6 +26,7 @@ static struct cmd_struct commands[] = {
 	{ CT_TEMP, "temp", temperature_call, temperature_usage },
 	{ CT_VOLT, "volt", voltage_call, voltage_usage },
 	{ CT_WDT, "wdt", watchdog_call, watchdog_usage },
+	{ CT_ADDON, "addon", addon_call, addon_usage },
 };
 
 static const char main_usage[] = "\n"
@@ -49,6 +50,7 @@ static const char main_usage[] = "\n"
     \t\ttemp - temperature sensors functions;\n\
     \t\tvolt - voltage sensors functions;\n\
     \t\twdt - watchdog functions\n\
+    \t\taddon - addon functions\n\
 \nTo learn more about API class args:\n\
 \t\t$ ktool <API class> -h\n";
 
