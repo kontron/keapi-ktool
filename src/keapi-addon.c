@@ -12,10 +12,13 @@ const char addon_usage[] = "\
     \t<status> 0: LED OFF 1: LED on\n\
     * LedGetStatus <no> \n\
     * LedGetConfig <no> \n\
+    * LedGetCaps <no> \n\
     * LedSetConfig <no> <Colour> <Light> <Mode> <TOn> <TOff>\n\
     \t the parameters should fit with the LED-configuation\n\
     \n\
-    * ( LedGetCaps <no> )\n\
+    * GetResetSource \n\
+    * ClearResetSource \n\
+    \n\
     ";
     
 int addon_call(const char *FunctName, int argc, const char *argv[])
@@ -57,6 +60,18 @@ int addon_call(const char *FunctName, int argc, const char *argv[])
 		if (retvalue == KEAPI_RET_SUCCESS)
 			printf("LedConfig: Colour:0x%X Light:0x%X mode:%d TOn:%d TOff:%d\n", 
                    ledConfig.Colour, ledConfig.Light, ledConfig.Mode, ledConfig.TOn, ledConfig.TOff);    
+
+        
+    } else if (strncasecmp(FunctName, "LedGetCaps", KEAPI_MAX_STR) == 0) {
+		int32_t ledNr = 0;
+		KEAPI_LED_CONFIG ledConfig;
+		CHECK_PARAMS(1);
+    
+		ledNr = atol(argv[0]);
+		retvalue = KEApiLedGetCaps(ledNr, &ledConfig);
+		if (retvalue == KEAPI_RET_SUCCESS)
+			printf("LedConfig: Colour:0x%X Light:0x%X mode:%d TOn:%d TOff:%d\n", 
+                   ledConfig.Colour, ledConfig.Light, ledConfig.Mode, ledConfig.TOn, ledConfig.TOff);    
             
     } else if (strncasecmp(FunctName, "LedSetConfig", KEAPI_MAX_STR) == 0) {
 		int32_t ledNr = 0;
@@ -71,6 +86,21 @@ int addon_call(const char *FunctName, int argc, const char *argv[])
 		ledConfig.TOff = atol(argv[5]);
                
 		retvalue = KEApiLedSetConfig (ledNr, ledConfig);
+   
+    } else if (strncasecmp(FunctName, "GetResetSource", KEAPI_MAX_STR) == 0) {
+		int32_t resetSource;
+		CHECK_PARAMS(0);
+
+		retvalue = KEApiGetResetSource(&resetSource);
+		if (retvalue == KEAPI_RET_SUCCESS)
+			printf("ResetSource: 0x%x\n", resetSource);        
+
+    } else if (strncasecmp(FunctName, "ClearResetSource", KEAPI_MAX_STR) == 0) {
+		CHECK_PARAMS(0);
+
+		retvalue = KEApiClearResetSource();
+		if (retvalue == KEAPI_RET_SUCCESS)
+			printf("done ClearResetSource\n");        
         
 	} else {
 		fprintf(stderr, "unknown api call: %s\n", FunctName);
