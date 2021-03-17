@@ -50,9 +50,9 @@ int pcidev_call(const char *FunctName, int argc, const char *argv[])
 						       pci_device_list[i].slot);
 						printf("Function   : %d\n",
 						       pci_device_list[i].funct);
-						printf("Device ID  : 0x%X\n",
+						printf("Device ID  : 0x%04X\n",
 						       pci_device_list[i].deviceId);
-						printf("Vendor ID  : 0x%X\n",
+						printf("Vendor ID  : 0x%04X\n",
 						       pci_device_list[i].vendorId);
 						printf("Class ID   : 0x%X\n",
 						       pci_device_list[i].classId);
