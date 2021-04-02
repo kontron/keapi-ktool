@@ -10,6 +10,7 @@ const char general_usage[] = "\
     * GetLibVersion\n\
     * GetBoardInfo\n\
     * GetBootCounter\n\
+    * GetSysInfo\n\
     * SystemUpTime\n\
     * GetIntruderStatus\n\
     * ResetIntruderStatus\n\
@@ -85,6 +86,33 @@ int general_call(const char *FunctName, int argc, const char *argv[])
 			printf("Number of boots: %d\n", boots);
 		else
 			printf("KEApiGetBootCounter - Error in function execution.\n");
+	} else if (strncasecmp(FunctName, "GetSysInfo", KEAPI_MAX_STR) == 0) {
+		KEAPI_SYSTEM_INFO sys_info;
+		CHECK_PARAMS(0);
+
+		retvalue = KEApiGetSysInfo(&sys_info);
+
+		if (retvalue == KEAPI_RET_SUCCESS
+				|| retvalue == KEAPI_RET_PARTIAL_SUCCESS) {
+
+			printf("System manufacturer: %s\n"
+			       "System name: %s\n"
+			       "System version: %s\n"
+			       "System SN: %s\n"
+			       "System UUID: %s\n"
+			       "System SKU: %s\n"
+			       "System family: %s\n",
+			sys_info.systemManufacturer,
+			sys_info.systemName,
+			sys_info.systemVersion,
+			sys_info.systemSerialNumber,
+			sys_info.systemUUID,
+			sys_info.systemSKUNumber,
+			sys_info.systemFamily);
+		}
+		else
+			printf("KEApiGetSysInfo - Error in function execution.\n");
+
 	} else if (strncasecmp(FunctName, "SystemUpTime", KEAPI_MAX_STR) == 0) {
 		int32_t SystemUpTime = 0;
 		CHECK_PARAMS(0);
